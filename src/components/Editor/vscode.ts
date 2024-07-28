@@ -1,5 +1,3 @@
-import 'vscode/localExtensionHost'
-
 import { createIndexedDBProviders } from "@codingame/monaco-vscode-files-service-override";
 import type { IEditorOverrideServices } from "vscode/services";
 import { initialize as initializeMonacoService } from "vscode/services";
