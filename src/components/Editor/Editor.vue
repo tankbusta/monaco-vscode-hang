@@ -1,6 +1,6 @@
 <template>
-  <div class="h-dvh w-dvh">
-    <div ref="codeEditor" v-bind="$attrs" class="h-screen"></div>
+  <div class="h-screen w-dvh">
+    <div ref="codeEditor" v-bind="$attrs" class="h-[calc(100vh-22px)]"></div>
     <div ref="statusBar"></div>
   </div>
 </template>
