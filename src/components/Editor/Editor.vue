@@ -1,14 +1,7 @@
 <template>
   <div class="h-dvh w-dvh">
-    <select v-model="language">
-      <option value="plaintext">Plain</option>
-      <option value="lua">Lua</option>
-      <option value="python">Python</option>
-      <option value="markdown">Markdown</option>
-    </select>
-    <span class="pl-2">{{ language }}</span>
-
     <div ref="codeEditor" v-bind="$attrs" class="h-screen"></div>
+    <div ref="statusBar"></div>
   </div>
 </template>
 
@@ -20,6 +13,7 @@ import {
   registerFileSystemOverlay,
   RegisteredMemoryFile,
 } from "@codingame/monaco-vscode-files-service-override";
+import { attachPart, Parts } from "@codingame/monaco-vscode-views-service-override";
 
 import { initVSCode } from "./vscode";
 
@@ -36,6 +30,7 @@ const emit = defineEmits<{
 }>();
 
 const language = ref<string>('plaintext');
+const statusBar = ref<HTMLDivElement>();
 const codeEditor = ref<HTMLDivElement>();
 const editorRef = ref<monaco.editor.IStandaloneCodeEditor>();
 
@@ -46,9 +41,9 @@ console.log("Monaco Service Inited");
 onMounted(async () => {
   const fileSystemProvider = new RegisteredFileSystemProvider(false);
   let filename =
-    props.filename ?? `/tmp/Unknown-${Math.floor(Math.random() * 200)}`;
+    props.filename ?? `/tmp/Unknown-${Math.floor(Math.random() * 200)}.lua`;
   if (!filename.startsWith("/")) {
-    filename = `/tmp/${filename}`;
+    filename = `/tmp/${filename}.lua`;
   }
   const fileUri = monaco.Uri.file(filename);
 
@@ -64,11 +59,11 @@ onMounted(async () => {
   const opts = {
     automaticLayout: true,
     model: modelRef.object.textEditorModel,
-    readOnly: props.disabled,
+    readOnly: props.disabled ?? false,
     ...props.monacoOptions,
   };
 
-  console.debug("Creating code editor", opts);
+  console.log("Creating code editor", opts);
 
   let editor = monaco.editor.create(codeEditor.value!, opts);
 
@@ -77,6 +72,7 @@ onMounted(async () => {
     editorModel.setValue(props.modelValue ?? "");
   }
 
+  attachPart(Parts.STATUSBAR_PART, statusBar.value!);
 
   editorRef.value = editor;
   editor.onDidChangeModelContent(() => {
